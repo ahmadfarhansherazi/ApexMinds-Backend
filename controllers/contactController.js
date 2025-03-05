@@ -4,25 +4,29 @@ const sendEmail = require("../utils/sendEmail");
 // Handle form submission
 const submitContactForm = async (req, res) => {
   try {
+    console.log('Received contact form submission:', req.body);
     const { name, email, message } = req.body;
 
     if (!name || !email || !message) {
+      console.log('Validation failed - Missing fields:', { name, email, message });
       return res.status(400).json({ message: "All fields are required" });
     }
 
     // Save the contact message to MongoDB
     const newContact = new Contact({ name, email, message });
-    await newContact.save();
+    const savedContact = await newContact.save();
+    console.log('Successfully saved contact to database:', savedContact);
 
     // Send confirmation email to admin
     await sendEmail(
-      process.env.ADMIN_EMAIL, // Admin's email
+      process.env.ADMIN_EMAIL,
       "New Contact Form Submission",
       `You received a new message from:
       \nName: ${name}
       \nEmail: ${email}
       \nMessage: ${message}`
     );
+    console.log('Confirmation email sent to admin');
 
     res.status(201).json({ message: "Message sent successfully!" });
   } catch (error) {

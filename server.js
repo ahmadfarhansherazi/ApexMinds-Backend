@@ -16,5 +16,5 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api", contactRoutes);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5004;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
