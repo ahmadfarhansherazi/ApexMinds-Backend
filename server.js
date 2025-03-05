@@ -16,5 +16,10 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api", contactRoutes);
 
-const PORT = process.env.PORT || 5004;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Default route to check if backend is running
+app.get("/", (req, res) => {
+  res.send("Backend is running!");
+});
+
+// Port (Vercel doesn't need manual port setting)
+module.exports = app;
