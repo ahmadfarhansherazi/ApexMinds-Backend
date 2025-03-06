@@ -1,25 +1,41 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const connectDB = require("./config/db");
-const contactRoutes = require("./routes/contactRoutes");
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
-dotenv.config();
-connectDB(); // Connect to MongoDB
+const sendEmail = async (to, subject, body, isHTML = false) => {
+  try {
+    console.log(`📧 Preparing to send email to: ${to}`);
 
-const app = express();
+    // Create email transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER, // Your email
+        pass: process.env.EMAIL_PASS, // Your email app password
+      },
+      tls: {
+        rejectUnauthorized: false, // Prevents SSL issues with some providers
+      },
+    });
 
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+    // Define email options
+    const mailOptions = {
+      from: `"ApexMinds AI" <${process.env.EMAIL_USER}>`, // Display name + sender email
+      to,
+      subject,
+      [isHTML ? "html" : "text"]: body, // Use 'html' for HTML emails, 'text' for plain text
+    };
 
-// Routes
-app.use("/api", contactRoutes);
+    // Send email
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✅ Email successfully sent to ${to}:`, info.response);
+    return true;
+  } catch (error) {
+    console.error("🔴 Error sending email:", {
+      recipient: to,
+      errorMessage: error.message,
+    });
+    return false;
+  }
+};
 
-// Default route to check if backend is running
-app.get("/", (req, res) => {
-  res.send("Backend is running!");
-});
-
-// Port (Vercel doesn't need manual port setting)
-module.exports = app;
+module.exports = sendEmail;
