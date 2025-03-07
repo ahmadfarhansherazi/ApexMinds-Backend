@@ -14,7 +14,7 @@ const submitContactForm = async (req, res) => {
     }
 
     // Save to database
-    console.log('💾 Saving to database...');
+    console.log('💾 Saving to database..');
     const newContact = new Contact({ name, email, message });
     const savedContact = await newContact.save();
     console.log('✅ Database save successful');
